@@ -16,7 +16,7 @@ interface AsteroidDao {
     fun getAsteroid(key: Long): AsteroidEntity?
 
     //Fetch all the asteroids from the database
-    @Query("select * from daily_asteroid_data order by epoch_approach_date")
+    @Query("select * from daily_asteroid_data order by close_approach_date DESC")
     fun getAsteroids(): LiveData<List<AsteroidEntity>>
 
     //implement cache
