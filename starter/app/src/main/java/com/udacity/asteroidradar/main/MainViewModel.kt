@@ -53,6 +53,7 @@ class MainViewModel : ViewModel() {
      */
     init {
         getAsteroidProperties()
+        getPictureOfTheDay()
     }
 
 
@@ -96,9 +97,11 @@ class MainViewModel : ViewModel() {
             try {
                 _pictureOfTheDay.value = NasaApi.retrofitService.getPictureOfTheDay(API_KEY)
                 _pictureStatus.value = PictureOfDayStatus.DONE
+
             } catch (e: Exception) {
                 _pictureStatus.value = PictureOfDayStatus.ERROR
             }
+
         }
     }
 
