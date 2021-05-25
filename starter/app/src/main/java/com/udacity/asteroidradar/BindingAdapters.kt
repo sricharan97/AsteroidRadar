@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar
 
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -43,5 +44,6 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 
 @BindingAdapter("imgUrl")
 fun bindDailyImage(view: ImageView, url: String?) {
+    Log.d("Binding adapters", url.toString())
     Picasso.with(view.context).load(url).placeholder(R.drawable.placeholder_picture_of_day).into(view)
 }
