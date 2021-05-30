@@ -45,6 +45,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * Call getAsteroidProperties() on init so we can display status immediately.
      */
     init {
+        getPictureOfTheDay()
         viewModelScope.launch {
             try {
                 asteroidsRepository.refreshAsteroids()
@@ -54,7 +55,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _asteroidStatus.value = AsteroidStatus.ERROR
             }
         }
-        getPictureOfTheDay()
+
     }
 
     //list of asteroids retrieved from the repository
