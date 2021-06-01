@@ -3,9 +3,10 @@ package com.udacity.asteroidradar.main
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.PictureOfDay
-import com.udacity.asteroidradar.api.NasaApi
+import com.udacity.asteroidradar.api.PictureApi
 import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
@@ -39,6 +40,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfTheDay
 
+    // Internally, we use a MutableLiveData to handle navigation to the selected property
+    private val _navigateToSelectedProperty = MutableLiveData<Asteroid>()
+
+    // The external immutable LiveData for the navigation property
+    val navigateToSelectedProperty: LiveData<Asteroid>
+        get() = _navigateToSelectedProperty
 
 
     /**
@@ -46,20 +53,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     init {
         getPictureOfTheDay()
+        getAsteroids()
+    }
+
+    //list of asteroids
+    val asteroids = asteroidsRepository.asteroids
+
+    private fun getAsteroids() {
         viewModelScope.launch {
             try {
                 asteroidsRepository.refreshAsteroids()
                 _asteroidStatus.value = AsteroidStatus.DONE
+                Log.d("MainViewModel", "retrieved the list of asteroids")
 
             } catch (e: Exception) {
                 _asteroidStatus.value = AsteroidStatus.ERROR
+                Log.d("MainViewModel", "Failed to retrieve the list of asteroids")
             }
         }
-
     }
 
-    //list of asteroids retrieved from the repository
-    val asteroids = asteroidsRepository.asteroids
 
 
     /**
@@ -71,7 +84,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                _pictureOfTheDay.value = NasaApi.retrofitService.getPictureOfTheDay(API_KEY)
+                _pictureOfTheDay.value = PictureApi.retrofitService.getPictureOfTheDay(API_KEY)
                 _pictureStatus.value = PictureOfDayStatus.DONE
                 Log.d("MainviewModel", _pictureOfTheDay.value!!.mediaType)
 
@@ -81,6 +94,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         }
     }
+
+
+    /**
+     * When the property is clicked, set the [_navigateToSelectedProperty] [MutableLiveData]
+     * @param asteroid The [Asteroid] that was clicked on.
+     */
+    fun displayAsteroidDetails(asteroid: Asteroid) {
+        _navigateToSelectedProperty.value = asteroid
+    }
+
+    /**
+     * After the navigation has taken place, make sure navigateToSelectedProperty is set to null
+     */
+    fun displayAsteroidDetailsComplete() {
+        _navigateToSelectedProperty.value = null
+    }
+
 
     /**
      * Factory for constructing MainViewModel with parameter

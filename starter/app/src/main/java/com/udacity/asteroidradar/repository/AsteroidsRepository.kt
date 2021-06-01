@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.Asteroid
@@ -38,11 +39,26 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
     suspend fun refreshAsteroids() {
 
         withContext(Dispatchers.IO) {
-            val jsonString = NasaApi.retrofitService.getAsteroids("2021-01-01",
-                    "2021-01-05",
-                    Constants.API_KEY)
-            val asteroidList = parseAsteroidsJsonResult(JSONObject(jsonString)).asDatabaseModel()
-            database.asteroidDao.insertAll(*asteroidList)
+            var jsonString = ""
+
+            try {
+                jsonString = NasaApi.retrofitService.getAsteroids(
+                        Constants.API_KEY)
+
+                Log.d("Repository", "urlUsed= $jsonString")
+            } catch (e: Exception) {
+                Log.d("Repository", "Failed in network call to API with JSOn string - $jsonString")
+            }
+            try {
+                val networkaAsteroidList = parseAsteroidsJsonResult(JSONObject(jsonString))
+                Log.d("Repository", "retrieved asteroids size = ${networkaAsteroidList.size}")
+                val asteroidList = networkaAsteroidList.asDatabaseModel()
+                Log.d("Repository", "no of asteroids fetched - ${asteroidList.size}")
+                database.asteroidDao.insertAll(*asteroidList)
+            } catch (e: Exception) {
+                Log.d("Repository", "Failed in parsing the JSONResult")
+            }
+
         }
 
     }

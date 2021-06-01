@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -18,8 +19,15 @@ import retrofit2.http.Query
  */
 
 private val moshi = Moshi.Builder()
-    .add(KotlinJsonAdapterFactory())
-    .build()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
+//Using OkHTTP client
+val client: OkHttpClient = OkHttpClient().newBuilder()
+        .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
 
 
 /**Create a retrofit object
@@ -27,24 +35,26 @@ private val moshi = Moshi.Builder()
  * the base URI for the web service, and a converter factory
  */
 private val retrofit = Retrofit.Builder()
-    .addConverterFactory(ScalarsConverterFactory.create())
-    .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .baseUrl(Constants.BASE_URL)
-    .build()
+        .client(client)
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .baseUrl(Constants.BASE_URL)
+        .build()
 
+
+interface PictureApiService {
+    @GET("/planetary/apod")
+    suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String)
+            : PictureOfDay
+}
 
 interface NasaApiService {
     @GET("neo/rest/v1/feed")
     suspend fun getAsteroids(
-            @Query("start_date") startDate: String,
-            @Query("end_date") endDate: String,
             @Query("api_key") apiKey: String
     )
             : String
 
-    @GET("/planetary/apod")
-    suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String)
-            : PictureOfDay
 }
 
 object NasaApi {
@@ -52,3 +62,11 @@ object NasaApi {
         retrofit.create(NasaApiService::class.java)
     }
 }
+
+
+object PictureApi {
+    val retrofitService: PictureApiService by lazy {
+        retrofit.create(PictureApiService::class.java)
+    }
+}
+
