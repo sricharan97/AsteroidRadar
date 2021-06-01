@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.PictureOfDay
-import com.udacity.asteroidradar.api.PictureApi
+import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
@@ -84,7 +84,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                _pictureOfTheDay.value = PictureApi.retrofitService.getPictureOfTheDay(API_KEY)
+                _pictureOfTheDay.value = NasaApi.retrofitService.getPictureOfTheDay(API_KEY)
                 _pictureStatus.value = PictureOfDayStatus.DONE
                 Log.d("MainviewModel", _pictureOfTheDay.value!!.mediaType)
 

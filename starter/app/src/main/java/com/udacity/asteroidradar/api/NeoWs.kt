@@ -42,18 +42,16 @@ private val retrofit = Retrofit.Builder()
         .build()
 
 
-interface PictureApiService {
-    @GET("/planetary/apod")
-    suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String)
-            : PictureOfDay
-}
-
 interface NasaApiService {
     @GET("neo/rest/v1/feed")
     suspend fun getAsteroids(
             @Query("api_key") apiKey: String
     )
             : String
+
+    @GET("/planetary/apod")
+    suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String)
+            : PictureOfDay
 
 }
 
@@ -64,9 +62,5 @@ object NasaApi {
 }
 
 
-object PictureApi {
-    val retrofitService: PictureApiService by lazy {
-        retrofit.create(PictureApiService::class.java)
-    }
-}
+
 
