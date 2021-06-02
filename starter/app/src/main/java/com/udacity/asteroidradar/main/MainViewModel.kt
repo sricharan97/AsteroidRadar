@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 
 enum class AsteroidStatus { LOADING, ERROR, DONE }
 enum class PictureOfDayStatus { LOADING, ERROR, DONE }
+enum class MenuItemFilter { SAVED, WEEK, TODAY }
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -40,6 +41,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfTheDay
 
+
     // Internally, we use a MutableLiveData to handle navigation to the selected property
     private val _navigateToSelectedProperty = MutableLiveData<Asteroid>()
 
@@ -47,17 +49,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val navigateToSelectedProperty: LiveData<Asteroid>
         get() = _navigateToSelectedProperty
 
+    private val _asteroidsSavedChange = MutableLiveData<Boolean>()
+
+    val asteroidsSavedChange: LiveData<Boolean>
+        get() = _asteroidsSavedChange
+
+    private val _asteroidsTodayChange = MutableLiveData<Boolean>()
+
+    val asteroidsTodayChange: LiveData<Boolean>
+        get() = _asteroidsTodayChange
+
+
+    private val _asteroidsWeekChange = MutableLiveData<Boolean>()
+
+    val asteroidsWeekChange: LiveData<Boolean>
+        get() = _asteroidsWeekChange
+
 
     /**
      * Call getAsteroidProperties() on init so we can display status immediately.
      */
     init {
+
         getPictureOfTheDay()
         getAsteroids()
     }
 
     //list of asteroids
     val asteroids = asteroidsRepository.asteroids
+    val asteroidsToday = asteroidsRepository.asteroidsToday
+    val asteroidsSaved = asteroidsRepository.asteroidsSaved
 
     private fun getAsteroids() {
         viewModelScope.launch {
@@ -109,6 +130,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun displayAsteroidDetailsComplete() {
         _navigateToSelectedProperty.value = null
+    }
+
+    /**
+     * function to modify the [asteroids] liveDate to reflect the menu
+     * item selection
+     */
+
+    fun getMenuItemAsteroids(filter: MenuItemFilter) {
+        when (filter) {
+
+            (MenuItemFilter.SAVED) -> _asteroidsSavedChange.value = true
+
+            (MenuItemFilter.TODAY) -> _asteroidsTodayChange.value = true
+
+            else -> _asteroidsWeekChange.value = true
+        }
+    }
+
+    fun setSavedAsteroidsChangeCompleted() {
+        _asteroidsSavedChange.value = false
+    }
+
+    fun setWeekAsteroidsChangeCompleted() {
+        _asteroidsWeekChange.value = false
+    }
+
+    fun setTodayAsteroidsChangeCompleted() {
+        _asteroidsTodayChange.value = false
     }
 
 

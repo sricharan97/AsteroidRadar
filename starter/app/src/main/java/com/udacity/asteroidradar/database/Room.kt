@@ -7,21 +7,28 @@ import androidx.room.*
 @Dao
 interface AsteroidDao {
 
-    //for testing the Room database
-    @Insert
-    fun insertAsteroid(asteroidEntity: AsteroidEntity)
 
-    //for testing the room database
-    @Query("select * from daily_asteroid_data where id= :key")
-    fun getAsteroid(key: Long): AsteroidEntity?
-
-    //Fetch all the asteroids from the database
-    @Query("select * from daily_asteroid_data order by close_approach_date DESC")
+    //Fetch this week's asteroids from the database
+    @Query("select * from daily_asteroid_data where date(close_approach_date) >= date('now')" +
+            " order by date(close_approach_date)")
     fun getAsteroids(): LiveData<List<AsteroidEntity>>
+
+
+    //Fetch all the asteroids saved to the database
+    @Query("select * from daily_asteroid_data order by date(close_approach_date)")
+    fun getSavedAsteroids(): LiveData<List<AsteroidEntity>>
+
+    //Fetch only today's asteroids
+    @Query("select * from daily_asteroid_data where date(close_approach_date) = date('now') ")
+    fun getAsteroidsForToday(): LiveData<List<AsteroidEntity>>
+
 
     //implement cache
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg asteroidEntities: AsteroidEntity)
+
+    @Delete
+    fun deletePreviousAsteroids(vararg asteroidEntities: AsteroidEntity)
 
 }
 
