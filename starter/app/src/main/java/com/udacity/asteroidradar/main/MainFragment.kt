@@ -20,6 +20,8 @@ class MainFragment : Fragment() {
 
     private var recyclerAdapter: AsteroidListAdapter? = null
 
+    private var currentMenuItem: MenuItemFilter = MenuItemFilter.WEEK
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -91,6 +93,16 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        when (currentMenuItem) {
+            MenuItemFilter.TODAY -> setRecyclerViewList(viewModel.asteroidsToday)
+            MenuItemFilter.SAVED -> setRecyclerViewList(viewModel.asteroidsSaved)
+            else -> setRecyclerViewList(viewModel.asteroids)
+        }
+
+    }
+
     private fun setRecyclerViewList(asteroids: LiveData<List<Asteroid>>) {
         recyclerAdapter!!.submitList(asteroids.value)
     }
@@ -104,16 +116,19 @@ class MainFragment : Fragment() {
         return when (item.itemId) {
             R.id.show_week_menu -> {
                 viewModel.getMenuItemAsteroids(MenuItemFilter.WEEK)
+                currentMenuItem = MenuItemFilter.WEEK
                 true
             }
 
             R.id.show_saved_menu -> {
                 viewModel.getMenuItemAsteroids(MenuItemFilter.SAVED)
+                currentMenuItem = MenuItemFilter.SAVED
                 true
             }
 
             R.id.show_today_menu -> {
                 viewModel.getMenuItemAsteroids(MenuItemFilter.TODAY)
+                currentMenuItem = MenuItemFilter.TODAY
                 true
             }
 
