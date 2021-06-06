@@ -49,21 +49,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val navigateToSelectedProperty: LiveData<Asteroid>
         get() = _navigateToSelectedProperty
 
-    private val _asteroidsSavedChange = MutableLiveData<Boolean>()
-
-    val asteroidsSavedChange: LiveData<Boolean>
-        get() = _asteroidsSavedChange
-
-    private val _asteroidsTodayChange = MutableLiveData<Boolean>()
-
-    val asteroidsTodayChange: LiveData<Boolean>
-        get() = _asteroidsTodayChange
+    //This list will be observed in the RecyclerView
+    private val _asteroidList = MutableLiveData<List<Asteroid>>()
+    val asteroidList: LiveData<List<Asteroid>>
+        get() = _asteroidList
 
 
-    private val _asteroidsWeekChange = MutableLiveData<Boolean>()
+    //Observer logic
+    private val asteroidListObserver = Observer<List<Asteroid>> {
+        //Update new list to RecyclerView
+        _asteroidList.value = it
+    }
 
-    val asteroidsWeekChange: LiveData<Boolean>
-        get() = _asteroidsWeekChange
+    private lateinit var asteroidListLiveData: LiveData<List<Asteroid>>
 
 
     /**
@@ -71,12 +69,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     init {
 
+
         getPictureOfTheDay()
         getAsteroids()
     }
 
     //list of asteroids
-    val asteroids = asteroidsRepository.asteroids
+    val asteroidsWeek = asteroidsRepository.asteroids
     val asteroidsToday = asteroidsRepository.asteroidsToday
     val asteroidsSaved = asteroidsRepository.asteroidsSaved
 
