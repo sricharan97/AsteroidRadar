@@ -1,5 +1,8 @@
 package com.udacity.asteroidradar.main
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -33,6 +36,15 @@ class MainFragment : Fragment() {
 
         binding.asteroidRecycler.adapter = recyclerAdapter
 
+        if (isNetworkConnected()) {
+            binding.activityMainImageOfTheDay.contentDescription =
+                    getString(R.string.nasa_picture_of_day_content_description_format,
+                            viewModel.pictureOfDay.value?.title)
+        } else {
+            binding.activityMainImageOfTheDay.contentDescription =
+                    getString(R.string.this_is_nasa_s_picture_of_day_showing_nothing_yet)
+        }
+
         // Observe the navigateToSelectedProperty LiveData and Navigate when it isn't null
         // After navigating, call displayAsteroidDetailsComplete() so that the ViewModel is ready
         // for another navigation event.
@@ -53,6 +65,12 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    private fun isNetworkConnected(): Boolean {
+        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+
+        return activeNetwork?.isConnectedOrConnecting == true
+    }
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
