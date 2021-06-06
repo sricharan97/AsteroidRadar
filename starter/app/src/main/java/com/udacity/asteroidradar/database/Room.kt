@@ -11,7 +11,7 @@ interface AsteroidDao {
     //Fetch this week's asteroids from the database
     @Query("select * from daily_asteroid_data where date(close_approach_date) >= date('now')" +
             " order by date(close_approach_date)")
-    fun getAsteroids(): LiveData<List<AsteroidEntity>>
+    fun getWeekAsteroids(): LiveData<List<AsteroidEntity>>
 
 
     //Fetch all the asteroids saved to the database
@@ -20,7 +20,7 @@ interface AsteroidDao {
 
     //Fetch only today's asteroids
     @Query("select * from daily_asteroid_data where date(close_approach_date) = date('now') ")
-    fun getAsteroidsForToday(): LiveData<List<AsteroidEntity>>
+    fun getTodayAsteroids(): LiveData<List<AsteroidEntity>>
 
 
     //implement cache

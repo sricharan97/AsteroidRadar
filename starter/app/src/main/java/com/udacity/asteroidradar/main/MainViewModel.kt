@@ -50,34 +50,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = _navigateToSelectedProperty
 
     //This list will be observed in the RecyclerView
-    private val _asteroidList = MutableLiveData<List<Asteroid>>()
-    val asteroidList: LiveData<List<Asteroid>>
-        get() = _asteroidList
+    private val _asteroids = MutableLiveData<List<Asteroid>>()
+    val asteroids: LiveData<List<Asteroid>>
+        get() = _asteroids
 
 
     //Observer logic
     private val asteroidListObserver = Observer<List<Asteroid>> {
         //Update new list to RecyclerView
-        _asteroidList.value = it
+        _asteroids.value = it
     }
 
-    private lateinit var asteroidListLiveData: LiveData<List<Asteroid>>
+    private var asteroidListLiveData: LiveData<List<Asteroid>>
 
 
     /**
      * Call getAsteroidProperties() on init so we can display status immediately.
      */
     init {
-
-
+        asteroidListLiveData = asteroidsRepository.getMenuItemSelection(MenuItemFilter.WEEK)
+        asteroidListLiveData.observeForever(asteroidListObserver)
         getPictureOfTheDay()
         getAsteroids()
     }
 
-    //list of asteroids
-    val asteroidsWeek = asteroidsRepository.asteroids
-    val asteroidsToday = asteroidsRepository.asteroidsToday
-    val asteroidsSaved = asteroidsRepository.asteroidsSaved
 
     private fun getAsteroids() {
         viewModelScope.launch {
@@ -136,27 +132,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * item selection
      */
 
-    fun getMenuItemAsteroids(filter: MenuItemFilter) {
-        when (filter) {
-
-            (MenuItemFilter.SAVED) -> _asteroidsSavedChange.value = true
-
-            (MenuItemFilter.TODAY) -> _asteroidsTodayChange.value = true
-
-            else -> _asteroidsWeekChange.value = true
-        }
+    fun updateFilter(filter: MenuItemFilter) {
+        //Observe the new filtered LiveData
+        asteroidListLiveData =
+                asteroidsRepository.getMenuItemSelection(filter)
+        asteroidListLiveData.observeForever(asteroidListObserver)
     }
 
-    fun setSavedAsteroidsChangeCompleted() {
-        _asteroidsSavedChange.value = false
-    }
-
-    fun setWeekAsteroidsChangeCompleted() {
-        _asteroidsWeekChange.value = false
-    }
-
-    fun setTodayAsteroidsChangeCompleted() {
-        _asteroidsTodayChange.value = false
+    override fun onCleared() {
+        super.onCleared()
+        //Clear observers
+        asteroidListLiveData.removeObserver(asteroidListObserver)
     }
 
 

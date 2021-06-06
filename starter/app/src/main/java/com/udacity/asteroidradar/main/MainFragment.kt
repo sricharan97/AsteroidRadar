@@ -3,11 +3,9 @@ package com.udacity.asteroidradar.main
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
@@ -19,8 +17,6 @@ class MainFragment : Fragment() {
     }
 
     private var recyclerAdapter: AsteroidListAdapter? = null
-
-    private var currentMenuItem: MenuItemFilter = MenuItemFilter.WEEK
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -51,61 +47,13 @@ class MainFragment : Fragment() {
             }
         })
 
-        viewModel.asteroidsSavedChange.observe(viewLifecycleOwner, Observer {
-            if (it == true) {
-                setRecyclerViewList(viewModel.asteroidsSaved)
-                viewModel.setSavedAsteroidsChangeCompleted()
-            }
-        })
-
-        viewModel.asteroidsWeekChange.observe(viewLifecycleOwner, Observer {
-            if (it == true) {
-                setRecyclerViewList(viewModel.asteroids)
-                viewModel.setWeekAsteroidsChangeCompleted()
-            }
-        })
-
-        viewModel.asteroidsTodayChange.observe(viewLifecycleOwner, Observer {
-            if (it == true) {
-                setRecyclerViewList(viewModel.asteroidsToday)
-                viewModel.setTodayAsteroidsChangeCompleted()
-            }
-        })
-
-        /**
-         * Any LiveData value will always be null unless you observe it
-         * so creating an observers on asteroidsToday and asteroidsSaved
-         * to return non-null list
-         */
-
-        viewModel.asteroidsToday.observe(viewLifecycleOwner, Observer {
-            setRecyclerViewList(viewModel.asteroidsToday)
-
-        })
-
-        viewModel.asteroidsSaved.observe(viewLifecycleOwner, Observer {
-            setRecyclerViewList(viewModel.asteroidsSaved)
-        })
-
 
         setHasOptionsMenu(true)
 
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        when (currentMenuItem) {
-            MenuItemFilter.TODAY -> setRecyclerViewList(viewModel.asteroidsToday)
-            MenuItemFilter.SAVED -> setRecyclerViewList(viewModel.asteroidsSaved)
-            else -> setRecyclerViewList(viewModel.asteroids)
-        }
 
-    }
-
-    private fun setRecyclerViewList(asteroids: LiveData<List<Asteroid>>) {
-        recyclerAdapter!!.submitList(asteroids.value)
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_overflow_menu, menu)
@@ -115,20 +63,17 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.show_week_menu -> {
-                viewModel.getMenuItemAsteroids(MenuItemFilter.WEEK)
-                currentMenuItem = MenuItemFilter.WEEK
+                viewModel.updateFilter(MenuItemFilter.WEEK)
                 true
             }
 
             R.id.show_saved_menu -> {
-                viewModel.getMenuItemAsteroids(MenuItemFilter.SAVED)
-                currentMenuItem = MenuItemFilter.SAVED
+                viewModel.updateFilter(MenuItemFilter.SAVED)
                 true
             }
 
             R.id.show_today_menu -> {
-                viewModel.getMenuItemAsteroids(MenuItemFilter.TODAY)
-                currentMenuItem = MenuItemFilter.TODAY
+                viewModel.updateFilter(MenuItemFilter.TODAY)
                 true
             }
 

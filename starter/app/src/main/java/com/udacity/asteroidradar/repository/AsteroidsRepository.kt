@@ -5,49 +5,49 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
-import com.udacity.asteroidradar.ConverterUtil
 import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.api.asDatabaseModel
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.asDatabaseModel
 import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.database.asDomainModel
+import com.udacity.asteroidradar.main.MenuItemFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.util.*
-import kotlin.collections.ArrayList
 
 class AsteroidsRepository(private val database: AsteroidsDatabase) {
 
-
     /**
-     * A list of asteroids that can be shown on the screen
+     * return the appropriate LiveData of asteroids based on the menu item filter
      */
-    val asteroids: LiveData<List<Asteroid>> =
-            Transformations.map(database.asteroidDao.getAsteroids()) {
-                it.asDomainModel()
+    fun getMenuItemSelection(filter: MenuItemFilter): LiveData<List<Asteroid>> {
+        return when (filter) {
+
+            (MenuItemFilter.SAVED) -> {
+                Transformations.map(database.asteroidDao.getSavedAsteroids()) {
+                    it.asDomainModel()
+                }
             }
 
-    val asteroidsSaved: LiveData<List<Asteroid>> =
-            Transformations.map(database.asteroidDao.getSavedAsteroids()) {
-                it.asDomainModel()
+            (MenuItemFilter.TODAY) -> {
+                Transformations.map(database.asteroidDao.getTodayAsteroids()) {
+                    it.asDomainModel()
+                }
             }
 
-    val asteroidsToday: LiveData<List<Asteroid>> =
-            Transformations.map(database.asteroidDao.getAsteroidsForToday()) {
-                it.asDomainModel()
+            else -> {
+                Transformations.map(database.asteroidDao.getWeekAsteroids()) {
+                    it.asDomainModel()
+                }
             }
-
-
-    private val asteroidList = asteroids.value
-
+        }
+    }
 
     /**
      * This function checks the list of asteroids present in the current liveData
      * and deletes asteroids whose approach date is before today. This need not be a suspend function
      * since it is being called from only the worker
-     */
+     *//*
     fun deleteOldAsteroids() {
 
         val asteroidsToDelete = ArrayList<Asteroid>()
@@ -64,7 +64,7 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
             }
             database.asteroidDao.deletePreviousAsteroids(*(asteroidsToDelete.asDatabaseModel()))
         }
-    }
+    }*/
 
 
     /**
