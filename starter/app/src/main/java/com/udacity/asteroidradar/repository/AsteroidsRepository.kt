@@ -43,29 +43,6 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
         }
     }
 
-    /**
-     * This function checks the list of asteroids present in the current liveData
-     * and deletes asteroids whose approach date is before today. This need not be a suspend function
-     * since it is being called from only the worker
-     *//*
-    fun deleteOldAsteroids() {
-
-        val asteroidsToDelete = ArrayList<Asteroid>()
-        val calendar = Calendar.getInstance()
-        val currentDateFormatted = ConverterUtil.dateFormat.parse(ConverterUtil.dateToString(calendar.time))
-        Log.d("Repository", asteroidList?.size.toString())
-        asteroidList?.let {
-            for (asteroid in it) {
-
-                if (ConverterUtil.StringToDate(asteroid.closeApproachDate) < currentDateFormatted) {
-                    asteroidsToDelete.add(asteroid)
-                    Log.d("Repository", asteroid.closeApproachDate)
-                }
-            }
-            database.asteroidDao.deletePreviousAsteroids(*(asteroidsToDelete.asDatabaseModel()))
-        }
-    }*/
-
 
     /**
      * Refresh the asteroids stored in the offline cache.
@@ -87,16 +64,17 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
                 jsonString = NasaApi.retrofitService.getAsteroids(
                         Constants.API_KEY)
 
-                Log.d("Repository", "urlUsed= $jsonString")
             } catch (e: Exception) {
-                Log.d("Repository", "Failed in network call to API with JSOn string - $jsonString")
+
+                Log.d("Repository", "Failed in network call to API ")
+
             }
             try {
+
                 val networkaAsteroidList = parseAsteroidsJsonResult(JSONObject(jsonString))
-                Log.d("Repository", "retrieved asteroids size = ${networkaAsteroidList.size}")
                 val asteroidList = networkaAsteroidList.asDatabaseModel()
-                Log.d("Repository", "no of asteroids fetched - ${asteroidList.size}")
                 database.asteroidDao.insertAll(*asteroidList)
+
             } catch (e: Exception) {
                 Log.d("Repository", "Failed in parsing the JSONResult")
 

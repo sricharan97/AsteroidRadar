@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.udacity.asteroidradar.main
 
 import android.content.Context
@@ -12,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
+@Suppress("DEPRECATION")
 class MainFragment : Fragment() {
 
     private val viewModel: MainViewModel by lazy {
@@ -36,6 +39,7 @@ class MainFragment : Fragment() {
 
         binding.asteroidRecycler.adapter = recyclerAdapter
 
+        //set the content description of Image of the day based on the network status
         if (isNetworkConnected()) {
             binding.activityMainImageOfTheDay.contentDescription =
                     getString(R.string.nasa_picture_of_day_content_description_format,
@@ -65,6 +69,9 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * function which returns if the device is connected to active network
+     */
     private fun isNetworkConnected(): Boolean {
         val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo

@@ -27,8 +27,6 @@ interface AsteroidDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg asteroidEntities: AsteroidEntity)
 
-    @Delete
-    fun deletePreviousAsteroids(vararg asteroidEntities: AsteroidEntity)
 
 }
 

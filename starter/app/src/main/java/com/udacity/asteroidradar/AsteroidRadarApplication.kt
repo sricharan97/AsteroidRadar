@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
  */
 class AsteroidRadarApplication : Application() {
 
-    val applicationScope = CoroutineScope(Dispatchers.Default)
+    private val applicationScope = CoroutineScope(Dispatchers.Default)
 
     private fun setUpRecurringWork() {
         val constraints = Constraints.Builder()

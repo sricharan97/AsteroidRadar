@@ -22,14 +22,14 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         val database = AsteroidsDatabase.getInstance(applicationContext)
         val repository = AsteroidsRepository(database)
+
         return try {
-           // repository.deleteOldAsteroids()
             repository.refreshAsteroids()
             Result.success()
+
         } catch (e: HttpException) {
             Result.retry()
         }
-
 
     }
 

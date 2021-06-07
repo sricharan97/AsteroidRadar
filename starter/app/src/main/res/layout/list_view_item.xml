@@ -42,8 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@{asteroid.closeApproachDate}"
-                android:textColor="@color/default_text_color"
-                android:textSize="18sp"
+                android:textColor="@color/text_grey"
+                android:textSize="16sp"
                 tools:text="approach date" />
 
         </LinearLayout>
@@ -54,6 +54,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             app:statusIcon="@{asteroid.isPotentiallyHazardous}"
+            android:contentDescription="@{asteroid.isPotentiallyHazardous ? @string/potentially_hazardous_asteroid_image_icon :@string/not_hazardous_asteroid_image_icon}"
             tools:background="@drawable/ic_status_normal" />
 
     </LinearLayout>

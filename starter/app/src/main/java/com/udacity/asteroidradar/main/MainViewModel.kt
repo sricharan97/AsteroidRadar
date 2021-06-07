@@ -11,28 +11,12 @@ import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
 
-enum class AsteroidStatus { LOADING, ERROR, DONE }
-enum class PictureOfDayStatus { LOADING, ERROR, DONE }
 enum class MenuItemFilter { SAVED, WEEK, TODAY }
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = AsteroidsDatabase.getInstance(application)
     private val asteroidsRepository = AsteroidsRepository(database)
-
-    // The internal MutableLiveData that stores the status of the most recent asteroids request
-    private val _asteroidStatus = MutableLiveData<AsteroidStatus>()
-
-    // The external immutable LiveData for the request status
-    val asteroidStatus: LiveData<AsteroidStatus>
-        get() = _asteroidStatus
-
-    // The internal MutableLiveData that stores the status of the most recent picture of the day request
-    private val _pictureStatus = MutableLiveData<PictureOfDayStatus>()
-
-    // The external immutable LiveData for the request status
-    val pictureStatus: LiveData<PictureOfDayStatus>
-        get() = _pictureStatus
 
     //The internal MutableLiveData for the pictureOfTheDay
     private val _pictureOfTheDay = MutableLiveData<PictureOfDay>()
@@ -64,9 +48,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var asteroidListLiveData: LiveData<List<Asteroid>>
 
 
-    /**
-     * Call getAsteroidProperties() on init so we can display status immediately.
-     */
+
     init {
         asteroidListLiveData = asteroidsRepository.getMenuItemSelection(MenuItemFilter.WEEK)
         asteroidListLiveData.observeForever(asteroidListObserver)
@@ -79,11 +61,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 asteroidsRepository.refreshAsteroids()
-                _asteroidStatus.value = AsteroidStatus.DONE
-                Log.d("MainViewModel", "retrieved the list of asteroids")
-
             } catch (e: Exception) {
-                _asteroidStatus.value = AsteroidStatus.ERROR
                 Log.d("MainViewModel", "Failed to retrieve the list of asteroids")
             }
         }
@@ -101,11 +79,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 _pictureOfTheDay.value = NasaApi.retrofitService.getPictureOfTheDay(API_KEY)
-                _pictureStatus.value = PictureOfDayStatus.DONE
-                Log.d("MainviewModel", _pictureOfTheDay.value!!.mediaType)
 
             } catch (e: Exception) {
-                _pictureStatus.value = PictureOfDayStatus.ERROR
+                Log.d("MainViewModel", "Failed to retrieve the picture of day")
             }
 
         }
