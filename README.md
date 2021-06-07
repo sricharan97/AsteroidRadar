@@ -9,6 +9,10 @@ The app consists of two screens: A Main screen with a list of all the detected a
 
 This kind of app is one of the most usual in the real world, what you will learn by doing this are some of the most fundamental skills you need to know to work as a professional Android developer, as fetching data from the internet, saving data to a database, and display the data in a clear, compelling UI.
 
+### API KEY
+
+Please replace the value "PROVIDE YOUR API KEY HERE" of the variable API_KEY inside the Constants.kt file to have the NASA API service working for you once you download the app.
+
 ### Screenshots
 
 ![Screenshot 1](starter/screenshots/screen_1.png)
